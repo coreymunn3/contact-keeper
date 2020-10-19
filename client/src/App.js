@@ -8,6 +8,7 @@ import About from './components/pages/About';
 import Navbar from './components/layout/Navbar';
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
+import Alerts from './components/layout/Alerts';
 // state
 import ContactState from './context/contact/ContactState';
 import AuthState from './context/auth/AuthState';
@@ -22,6 +23,7 @@ const App = () => {
             <Fragment className='App'>
               <Navbar />
               <div className='container'>
+                <Alerts />
                 <Switch>
                   <Route exact path='/' component={Home} />
                   <Route exact path='/about' component={About} />
