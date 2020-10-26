@@ -3,20 +3,24 @@ import React, { useContext, useEffect, useState } from 'react';
 import AuthContext from '../../context/auth/authContext';
 import AlertContext from '../../context/alert/alertContext';
 
-const Register = () => {
+const Register = (props) => {
   // global state
   const alertContext = useContext(AlertContext);
   const { setAlert } = alertContext;
 
   const authContext = useContext(AuthContext);
-  const { register, error, clearErrors } = authContext;
+  const { register, error, clearErrors, isAuthenticated } = authContext;
   // show alert on auth context error state change
   useEffect(() => {
-    if (error === 'User already exists') {
+    if (isAuthenticated) {
+      props.history.push('/');
+    }
+    if (error === 'User Already Exists') {
       setAlert(error, 'danger');
       clearErrors();
     }
-  }, [error]);
+    // eslint-disable-next-line
+  }, [error, isAuthenticated, props.history]);
   // local form state
   const [user, setUser] = useState({
     name: '',

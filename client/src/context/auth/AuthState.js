@@ -2,6 +2,7 @@ import React, { useReducer } from 'react';
 import authContext from './authContext';
 import authReducer from './authReducer';
 import axios from 'axios';
+import setAuthToken from '../../utils/setAuthToken';
 
 import {
   REGISTER_SUCCESS,
@@ -27,6 +28,23 @@ const AuthState = (props) => {
 
   // methods
   // Load User
+  const loadUser = async () => {
+    // load token into global header
+    if (localStorage.token) {
+      setAuthToken(localStorage.token);
+    }
+    try {
+      const res = await axios.get('/api/auth');
+      dispatch({
+        type: USER_LOADED,
+        payload: res.data,
+      });
+    } catch (error) {
+      dispatch({
+        type: AUTH_ERROR,
+      });
+    }
+  };
   // Register User
   const register = async (formData) => {
     const config = {
@@ -41,6 +59,7 @@ const AuthState = (props) => {
         // res.data is the JWT token
         payload: res.data,
       });
+      loadUser();
     } catch (error) {
       dispatch({
         type: REGISTER_FAIL,
@@ -49,13 +68,34 @@ const AuthState = (props) => {
     }
   };
   // Login User
+  const login = async (formData) => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    try {
+      const res = await axios.post(`/api/auth`, formData, config);
+      dispatch({
+        type: LOGIN_SUCCESS,
+        // res.data is the JWT token
+        payload: res.data,
+      });
+      loadUser();
+    } catch (error) {
+      dispatch({
+        type: LOGIN_FAIL,
+        payload: error.response.data.msg,
+      });
+    }
+  };
   // Logout
+  const logout = () => dispatch({ type: LOGOUT });
   // Clear Errors
-  const clearErrors = () => {
+  const clearErrors = () =>
     dispatch({
       type: CLEAR_ERRORS,
     });
-  };
 
   return (
     <authContext.Provider
@@ -67,6 +107,9 @@ const AuthState = (props) => {
         error: state.error,
         register,
         clearErrors,
+        loadUser,
+        login,
+        logout,
       }}
     >
       {props.children}
